@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>A1_Book</title>
+  </head>
+  
+ <script>
+  window.watsonAssistantChatOptions = {
+    integrationID: "c4a9d6d2-5fa7-4270-b681-ac45e1b9f2f0", // The ID of this integration.
+    region: "eu-de", // The region your integration is hosted in.
+    serviceInstanceID: "25aa5c73-cbb5-42b3-8a2d-585abcb66967", // The ID of your service instance.
+    onLoad: async (instance) => { await instance.render(); }
+  };
+  setTimeout(function(){
+    const t=document.createElement('script');
+    t.src="https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+    document.head.appendChild(t);
+  });
+</script>
+</html>
