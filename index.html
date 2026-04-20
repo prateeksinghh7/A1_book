@@ -1,119 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Library</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 Book Library</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #eef2f3;
+}
 
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
+header {
+    background: linear-gradient(45deg,#1e3c72,#2a5298);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
 
-        nav {
-            background: #34495e;
-            padding: 10px;
-            text-align: center;
-        }
+nav {
+    background: #2c3e50;
+    padding: 10px;
+    text-align: center;
+}
 
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+nav input, nav select {
+    padding: 6px;
+    margin: 5px;
+}
 
-        nav a:hover {
-            color: #f1c40f;
-        }
+.container {
+    padding: 20px;
+}
 
-        .container {
-            padding: 20px;
-        }
+.book {
+    background: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
 
-        .book {
-            background: white;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+.book:hover {
+    transform: scale(1.02);
+}
 
-        footer {
-            text-align: center;
-            padding: 10px;
-            background: #2c3e50;
-            color: white;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-    </style>
+button {
+    margin: 5px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.like { background: #e74c3c; color: white; }
+.view { background: #3498db; color: white; }
+.add { background: #2ecc71; color: white; }
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #2c3e50;
+    color: white;
+}
+
+/* Popup */
+.popup {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    width: 40%;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px black;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-    <h1>📚 My Book Library</h1>
-    <p>Explore your favorite books</p>
+<h1>📚 A1 Book Library</h1>
+<p>Interactive Smart Library</p>
 </header>
 
 <nav>
-    <a href="#">Home</a>
-    <a href="#">Books</a>
-    <a href="#">Categories</a>
-    <a href="#">Contact</a>
+<input type="text" id="search" placeholder="Search books...">
+<select id="category">
+<option value="all">All</option>
+<option value="finance">Finance</option>
+<option value="story">Story</option>
+<option value="magic">Magic</option>
+</select>
+<button class="add" onclick="addBook()">➕ Add Book</button>
 </nav>
 
-<div class="container">
-    <div class="book">
-        <h2>The Alchemist</h2>
-        <p><strong>Author:</strong> Paulo Coelho</p>
-        <p>A philosophical book about following your dreams.</p>
-    </div>
+<div class="container" id="bookList"></div>
 
-    <div class="book">
-        <h2>Rich Dad Poor Dad</h2>
-        <p><strong>Author:</strong> Robert Kiyosaki</p>
-        <p>A guide to financial independence and investing.</p>
-    </div>
-
-    <div class="book">
-        <h2>Harry Potter</h2>
-        <p><strong>Author:</strong> J.K. Rowling</p>
-        <p>A magical journey of a young wizard.</p>
-    </div>
+<!-- Popup -->
+<div class="popup" id="popup">
+<h2 id="popupTitle"></h2>
+<p id="popupDesc"></p>
+<button onclick="closePopup()">Close</button>
 </div>
 
 <footer>
-    <p>©️ 2026 Book Library | All Rights Reserved</p>
+<p>© 2026 A1 Book Library</p>
 </footer>
 
-<!-- IBM Watson Assistant Chat Integration -->
 <script>
-  window.watsonAssistantChatOptions = {
-    integrationID: "f87a9b8f-b25a-4b14-acdc-18dcaf368718",
-    region: "eu-de",
-    serviceInstanceID: "0e014fc0-1655-4b8a-9992-780b742e551f",
-    onLoad: async (instance) => { await instance.render(); }
-  };
+let books = [
+{title:"The Alchemist", author:"Paulo Coelho", category:"story", desc:"Follow your dreams."},
+{title:"Rich Dad Poor Dad", author:"Robert Kiyosaki", category:"finance", desc:"Financial education."},
+{title:"Harry Potter", author:"J.K. Rowling", category:"magic", desc:"Wizard story."}
+];
 
-  setTimeout(function(){
-    const t = document.createElement('script');
-    t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" +
-            (window.watsonAssistantChatOptions.clientVersion || 'latest') +
-            "/WatsonAssistantChatEntry.js";
-    document.head.appendChild(t);
-  });
+function displayBooks() {
+    let list = document.getElementById("bookList");
+    list.innerHTML = "";
+
+    let search = document.getElementById("search").value.toLowerCase();
+    let category = document.getElementById("category").value;
+
+    books.forEach((b,i) => {
+        if ((b.title.toLowerCase().includes(search)) &&
+            (category=="all" || b.category==category)) {
+
+            list.innerHTML += `
+            <div class="book">
+                <h2>${b.title}</h2>
+                <p><b>Author:</b> ${b.author}</p>
+                <button class="view" onclick="viewBook(${i})">View</button>
+                <button class="like" onclick="likeBook(this)">❤️ Like</button>
+            </div>`;
+        }
+    });
+}
+
+function viewBook(i) {
+    document.getElementById("popupTitle").innerText = books[i].title;
+    document.getElementById("popupDesc").innerText = books[i].desc;
+    document.getElementById("popup").style.display = "block";
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+function likeBook(btn) {
+    btn.innerText = "❤️ Liked";
+    btn.style.background = "green";
+}
+
+function addBook() {
+    let title = prompt("Enter Book Name:");
+    let author = prompt("Enter Author:");
+    let category = prompt("Enter Category:");
+    let desc = prompt("Enter Description:");
+
+    if(title){
+        books.push({title,author,category,desc});
+        displayBooks();
+    }
+}
+
+document.getElementById("search").addEventListener("keyup", displayBooks);
+document.getElementById("category").addEventListener("change", displayBooks);
+
+displayBooks();
+</script>
+
+<!-- IBM Watson Chat -->
+<script>
+window.watsonAssistantChatOptions = {
+integrationID: "f87a9b8f-b25a-4b14-acdc-18dcaf368718",
+region: "eu-de",
+serviceInstanceID: "0e014fc0-1655-4b8a-9992-780b742e551f",
+onLoad: async (instance) => { await instance.render(); }
+};
+
+setTimeout(function(){
+const t = document.createElement('script');
+t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" +
+(window.watsonAssistantChatOptions.clientVersion || 'latest') +
+"/WatsonAssistantChatEntry.js";
+document.head.appendChild(t);
+});
 </script>
 
 </body>
